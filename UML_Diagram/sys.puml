@@ -1,0 +1,18 @@
+@startuml
+skinparam actorStyle awesome
+
+actor ":Travel Agent" as Agent
+participant ":System" as System
+
+Agent -> System : addResort(name, location, description)
+System --> Agent : promptForRoomDetails
+
+loop for each room type
+    Agent -> System : addRoom(resortID, type, capacity, price)
+    System --> Agent : updateRoomList
+end
+
+Agent -> System : confirmResort()
+System --> Agent : resortConfirmation(resortID)
+
+@enduml

@@ -1,0 +1,66 @@
+@startuml
+hide circle
+top to bottom direction
+skinparam dpi 350
+
+!define ENTITY(x) class x << Entity >>
+!define AGGREGATE_ROOT_ENTITY(x) class x << Aggregate Root >> << Entity >>
+!define VALUE_OBJECT(x) class x << Value Object >>
+
+Package "Job Booking Context (Core)" {
+
+AGGREGATE_ROOT_ENTITY(Job) {
+    jobId: UUID
+    status: Enum
+    customerId: UUID
+    handymanId: UUID
+    serviceRequestId: UUID
+}
+
+VALUE_OBJECT(JobIdentifier) {
+    jobId: UUID
+}
+
+VALUE_OBJECT(Schedule) {
+    scheduledDate: Date
+    startTime: DateTime
+    endTime: DateTime
+    estimatedDuration: Integer
+}
+
+VALUE_OBJECT(JobLocation) {
+    street: String
+    city: String
+    postalCode: String
+}
+
+ENTITY(JobTask) {
+    taskId: UUID
+    description: String
+    serviceCategory: String
+}
+
+VALUE_OBJECT(JobTaskIdentifier) {
+    taskId: UUID
+}
+
+AGGREGATE_ROOT_ENTITY(Appointment) {
+    appointmentId: UUID
+    jobId: UUID
+    confirmedAt: DateTime
+}
+
+VALUE_OBJECT(AppointmentIdentifier) {
+    appointmentId: UUID
+}
+
+Job --> JobIdentifier
+Job o--> Schedule
+Job o--> JobLocation
+Job --> JobTaskIdentifier
+Job --> AppointmentIdentifier
+
+Appointment --> AppointmentIdentifier
+JobTask --> JobTaskIdentifier
+}
+@enduml

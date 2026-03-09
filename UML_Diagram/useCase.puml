@@ -1,0 +1,25 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+
+class Student {
+    + name
+    + studentID
+}
+
+class Course {
+    + title
+    + courseCode
+    + capacity: int
+}
+
+class Registration {
+    + registrationDate: Date
+}
+
+'Student  -- "0..*" Course
+'(Student, Course) .. Registration
+
+Student  -- "0..*" Registration
+Registration -- "1..*" Course
+@enduml

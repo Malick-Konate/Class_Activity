@@ -1,0 +1,109 @@
+services:
+  class_activity:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: class_activity
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql1/handyman
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=pwd
+    depends_on:
+      mysql1:
+        condition: service_healthy
+
+  mysql1:
+    image: mysql:8
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=handyman
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pwd
+    volumes:
+      - ./data/mysql1:/var/lib/mysql1
+      - ./data/init.d:/docker-entrypoint-initdb.d
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-uuser",
+          "-ppwd",
+          "-h",
+          "localhost",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin:5.2.0
+    container_name: handyman
+    links:
+      - mysql1
+    restart: always
+    ports:
+      - 5013:80
+    environment:
+#      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql1
+
+    depends_on:
+      mysql1:
+        condition: service_healthy
+
+
+
+
+
+#services:
+#  app:
+#    build:
+#      context: .
+#      dockerfile:  Dockerfile
+#    container_name: handyman-app
+#    ports:
+#    - "8080:8080"
+#    environment:
+#    - SPRING_PROFILES_ACTIVE=dev
+#    - JAVA_OPTS=-Xmx512m -Xms256m
+#    restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+#      interval: 30s
+#      timeout: 3s
+#      retries: 3
+#      start_period: 60s
+#  mysql1:
+#    image: mysql:8
+#    ports:
+#      - "3307:3306"
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=rootpass
+#      - MYSQL_DATABASE=handyman
+#      - MYSQL_USER=user
+#      - MYSQL_PASSWORD=pwd
+#    volumes:
+#      - ./data/mysql1:/var/lib/mysql1
+#      - ./data/init.d:/docker-entrypoint-initdb.d
+#    healthcheck:
+#      test:
+#        [
+#          "CMD",
+#          "mysqladmin",
+#          "ping",
+#          "-uuser",
+#          "-ppwd",
+#          "-h",
+#          "localhost",
+#        ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+##

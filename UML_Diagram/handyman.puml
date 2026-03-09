@@ -1,0 +1,65 @@
+@startuml
+hide circle
+top to bottom direction
+skinparam dpi 350
+
+!define ENTITY(x) class x << Entity >>
+!define AGGREGATE_ROOT_ENTITY(x) class x << Aggregate Root >> << Entity >>
+!define VALUE_OBJECT(x) class x << Value Object >>
+
+Package "Handyman Profile Context (Supporting)" {
+
+AGGREGATE_ROOT_ENTITY(HandymanProfile) {
+    handymanId: UUID
+    name: String
+    email: String
+    isActive: Boolean
+    isVerified: Boolean
+}
+
+VALUE_OBJECT(HandymanIdentifier) {
+    handymanId: UUID
+}
+
+VALUE_OBJECT(SkillSet) {
+    skillName: String
+    proficiencyLevel: Enum
+}
+
+VALUE_OBJECT(WorkZone) {
+    city: String
+    province: String
+    maxTravelDistance: Float
+}
+
+VALUE_OBJECT(AvailabilityCalendar) {
+    lastUpdated: DateTime
+}
+
+VALUE_OBJECT(CalendarEntry) {
+    dayOfWeek: String
+    startTime: DateTime
+    endTime: DateTime
+}
+
+VALUE_OBJECT(BackgroundCheckIdentifier) {
+    backgroundCheckId: UUID
+}
+
+AGGREGATE_ROOT_ENTITY(BackgroundCheck) {
+    checkId: UUID
+    handymanId: UUID
+    status: Enum
+    performedDate: DateTime
+}
+
+HandymanProfile --> HandymanIdentifier
+HandymanProfile o--> "0..*" SkillSet
+HandymanProfile o--> WorkZone
+HandymanProfile o--> AvailabilityCalendar
+AvailabilityCalendar *--> "0..*" CalendarEntry
+
+BackgroundCheck --> BackgroundCheckIdentifier
+BackgroundCheck --> HandymanIdentifier
+}
+@enduml

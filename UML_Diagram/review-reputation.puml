@@ -1,0 +1,59 @@
+@startuml
+hide circle
+top to bottom direction
+skinparam dpi 350
+
+!define ENTITY(x) class x << Entity >>
+!define AGGREGATE_ROOT_ENTITY(x) class x << Aggregate Root >> << Entity >>
+!define VALUE_OBJECT(x) class x << Value Object >>
+
+Package "Review & Reputation Context (Supporting)" {
+
+AGGREGATE_ROOT_ENTITY(Review) {
+    reviewId: UUID
+    jobId: UUID
+    customerId: UUID
+    handymanId: UUID
+    createdAt: DateTime
+    isVerified: Boolean
+    wouldRecommend: Boolean
+}
+
+VALUE_OBJECT(ReviewIdentifier) {
+    reviewId: UUID
+}
+
+VALUE_OBJECT(Rating) {
+    overallScore: Integer
+    professionalismScore: Integer
+    qualityScore: Integer
+    punctualityScore: Integer
+}
+
+VALUE_OBJECT(Feedback) {
+    comment: String
+}
+
+VALUE_OBJECT(ReviewResponse) {
+    responseText: String
+    respondedAt: DateTime
+}
+
+AGGREGATE_ROOT_ENTITY(ReputationScore) {
+    reputationId: UUID
+    handymanId: UUID
+    totalReviews: Integer
+    averageRating: Decimal
+}
+
+VALUE_OBJECT(reputationIdentifier) {
+    reputationId: UUID
+}
+
+Review o--> Rating
+Review o--> Feedback
+Review o--> "0..1" ReviewResponse
+Review --> ReviewIdentifier
+ReputationScore --> reputationIdentifier
+}
+@enduml

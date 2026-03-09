@@ -1,0 +1,95 @@
+@startuml
+hide circle
+top to bottom direction
+!pragma useVerticalIf on
+skinparam dpi 350
+
+!define ENTITY(x) class x << Entity >>
+!define AGGREGATE_ROOT_ENTITY(x) class x << Aggregate Root >> << Entity >>
+!define VALUE_OBJECT(x) class x << Value Object >>
+
+Package "Service Requester Context (Core)" {
+
+AGGREGATE_ROOT_ENTITY(ServiceRequest) {
+    requestId: UUID
+    customerId: UUID
+    status: String
+    urgency: String
+    createdAt: DateTime
+    preferredDate: DateTime
+}
+
+VALUE_OBJECT(ServiceRequestIdentifier) {
+    requestId: UUID
+}
+
+VALUE_OBJECT(ProblemDescription) {
+    title: String
+    details: String
+    category: String
+    estimatedComplexity: String
+}
+
+ENTITY(Customer) {
+    customerId: UUID
+    firstName: String
+    lastName: String
+    email: String
+    registrationDate: DateTime
+}
+
+VALUE_OBJECT(CustomerIdentifier) {
+    customerId: UUID
+}
+
+VALUE_OBJECT(CustomerAddress) {
+    street: String
+    city: String
+    province: String
+    postalCode: String
+    country: String
+}
+
+VALUE_OBJECT(CustomerPhoneNumber) {
+    type: String
+    number: String
+}
+
+VALUE_OBJECT(Preferences) {
+    maxBudget: Money
+    preferredHandymanGender: String
+    languagePreference: String
+    requiresInsurance: Boolean
+}
+
+VALUE_OBJECT(SearchCriteria) {
+    serviceCategory: String
+    maxDistance: Integer
+    minRating: Decimal
+    availabilityWindow: DateRange
+}
+
+VALUE_OBJECT(Money) {
+    amount: Decimal
+    currency: String
+}
+
+VALUE_OBJECT(DateRange) {
+    startDate: DateTime
+    endDate: DateTime
+}
+
+ServiceRequest --> ServiceRequestIdentifier
+ServiceRequest o--> ProblemDescription
+ServiceRequest o--> Preferences
+ServiceRequest o--> SearchCriteria
+ServiceRequest --> CustomerIdentifier
+
+Customer --> CustomerIdentifier
+Customer o--> CustomerAddress
+Customer o-- "1..*" CustomerPhoneNumber
+
+Preferences o--> Money
+SearchCriteria o--> DateRange
+}
+@enduml

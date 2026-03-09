@@ -1,0 +1,60 @@
+@startuml
+hide circle
+top to bottom direction
+skinparam dpi 350
+
+!define ENTITY(x) class x << Entity >>
+!define AGGREGATE_ROOT_ENTITY(x) class x << Aggregate Root >> << Entity >>
+!define VALUE_OBJECT(x) class x << Value Object >>
+
+Package "Payment & Billing Context (Generic)" {
+
+AGGREGATE_ROOT_ENTITY(Invoice) {
+    invoiceId: UUID
+    invoiceNumber: String
+    issueDate: DateTime
+    dueDate: DateTime
+    totalAmount: Decimal
+}
+
+VALUE_OBJECT(LineItem) {
+    description: String
+    quantity: Integer
+    unitPrice: Decimal
+    subtotal: Decimal
+}
+
+AGGREGATE_ROOT_ENTITY(Escrow) {
+    escrowId: UUID
+    jobId: UUID
+    heldAmount: Decimal
+    releaseDate: DateTime
+}
+
+ENTITY(Transaction) {
+    transactionId: UUID
+    date: DateTime
+    status: String
+}
+
+VALUE_OBJECT(TransactionIdentifier) {
+    transactionId: UUID
+}
+
+ENTITY(Payout) {
+    payoutId: UUID
+    netAmount: Decimal
+    fee: Decimal
+}
+
+VALUE_OBJECT(PayoutIdentifier) {
+    payoutId: UUID
+}
+
+Invoice *--> "1..*" LineItem
+Escrow --> TransactionIdentifier
+Escrow --> PayoutIdentifier
+Transaction --> TransactionIdentifier
+Payout --> PayoutIdentifier
+}
+@enduml
