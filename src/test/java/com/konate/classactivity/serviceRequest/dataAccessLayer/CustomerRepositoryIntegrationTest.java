@@ -1,4 +1,4 @@
-package com.konate.classactivity.serviceRequest;
+package com.konate.classactivity.serviceRequest.dataAccessLayer;
 
 import com.konate.classactivity.serviceRequester.DataAccessLayer.customer.*;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ActiveProfiles("test")
 @Sql({"/data.sql"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class CustomerEntityUnitTest {
+public class CustomerRepositoryIntegrationTest {
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -60,7 +60,7 @@ public class CustomerEntityUnitTest {
 
     @Test
     void whenCustomerDeleted_thenCustomerShouldNotExist() {
-        // Arrange - fetch an existing customer from the DB
+
         Customer existingCustomer = customerRepository.findAll().stream()
                 .filter(c -> c.getCustomerIdentifier().getCustomerId().equals(VALID_CUSTOMER_ID))
                 .findFirst()
@@ -75,9 +75,78 @@ public class CustomerEntityUnitTest {
         assertFalse(exists, "The customer should no longer exist in the database after deletion");
     }
 
+
+
+    @Test
+    void shouldFindCustomer_byEmail() {
+
+        String existingEmail = "george@example.com";
+
+        // Act
+        Customer found = customerRepository.findCustomerByEmail(existingEmail);
+
+        // Assert
+        assertNotNull(found, "Customer should be found by a valid email");
+        assertEquals(existingEmail, found.getEmail());
+    }
+
+    @Test
+    void shouldReturnEmpty_whenEmailDoesNotExist() {
+        // Arrange
+        String nonExistentEmail = "ghost@doesnotexist.com";
+
+        // Act
+        Customer found = customerRepository.findCustomerByEmail(nonExistentEmail);
+
+        // Assert
+        assertNull(found, "Repository should return null when no customer matches the email");
+    }
+
+    @Test
+    void shouldReturnTrue_whenEmailAlreadyExists() {
+
+
+        String existingEmail = "george@example.com";
+
+        // Act
+        Customer found = customerRepository.findCustomerByEmail(existingEmail);
+
+        // Assert
+        assertNotNull(found, "The email should already exist in the database");
+    }
+
+    @Test
+    void shouldReturnFalse_whenEmailDoesNotExist() {
+        // Act
+        Customer found = customerRepository.findCustomerByEmail("new-user@test.com");
+
+        // Assert
+        assertNull(found, "The email should not exist in the database");
+    }
+
+    @Test
+    void shouldReturnEmptyList_whenFindAllByEmail_withNonExistentEmail() {
+        // Act - Testing the 'findAllByEmail' variant
+        List<Customer> customers = (List<Customer>) customerRepository.findAllByEmail("unknown@test.com");
+
+        // Assert
+        assertTrue(customers == null || ((List<?>)customers).isEmpty(),
+                "Should return an empty result if email is not found");
+    }
+
+    @Test
+    void shouldFindCustomer_byCustomerId() {
+        // Act
+        Customer found = customerRepository.findAllByCustomerIdentifier_CustomerId(VALID_CUSTOMER_ID);
+
+        // Assert
+        assertNotNull(found);
+        assertEquals(VALID_CUSTOMER_ID, found.getCustomerIdentifier().getCustomerId());
+    }
+
     private Customer buildSampleCustomer() {
         return Customer.builder()
-                .customerIdentifier(new CustomerIdentifier()) // Auto-generates UUID
+                .customerIdentifier(new CustomerIdentifier())
                 .firstName("Malick")
                 .lastName("Konate")
                 .email("malick@example.com")
